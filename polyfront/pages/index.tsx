@@ -1,86 +1,386 @@
-import type { NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
+import React, { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import { ethers } from "ethers";
+import "react-toastify/dist/ReactToastify.css";
 
-const Home: NextPage = () => {
+import Head from "next/head";
+
+
+export default function Home() {
+  /**
+   * Create a variable here that holds the contract address after you deploy!
+   */
+  const contractAddress = "";
+
+  /**
+   * Create a variable here that references the abi content!
+   */
+  const contractABI = abi.abi;
+
+  /*
+   * Just a state variable we use to store our user's public wallet.
+   */
+  const [currentAccount, setCurrentAccount] = useState("");
+
+  const [description, setMessage] = useState("");
+
+  const [title, setName] = useState("");
+
+  /*
+   * All state property to store all payments
+   */
+  const [allPay, setAllPay] = useState([]);
+
+  const checkIfWalletIsConnected = async () => {
+    try {
+      const { ethereum } = window;
+
+      /*
+       * Check if we're authorized to access the user's wallet
+       */
+      const accounts = await ethereum.request({ method: "eth_accounts" });
+
+      if (accounts.length !== 0) {
+        const account = accounts[0];
+        setCurrentAccount(account);
+        toast.success("Wallet is Connected", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      } else {
+        toast.warn("Make sure you have MetaMask Connected", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+    } catch (error) {
+      toast.error(`${error.message}`, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  };
+
+  /**
+   * Implement your connectWallet method here
+   */
+  const connectWallet = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (!ethereum) {
+        toast.warn("Make sure you have MetaMask Connected", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return;
+      }
+
+      const accounts = await ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      setCurrentAccount(accounts[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const buyItem = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const payPortalContract = new ethers.Contract(
+          contractAddress,
+          contractABI,
+          signer
+        );
+
+        let count = await payPortalContract.getTotalPay();
+        console.log("Retrieved total payments count...", count.toNumber());
+
+        /*
+         * Execute the actual payment from your smart contract
+         */
+        const payTxn = await payPortalContract.buyPay(
+          description ? description : "Lovely Item",
+          title ? title : "Cup",
+          ethers.utils.parseEther("0.000001"),
+          {
+            gasLimit: 300000,
+          }
+        );
+        console.log("Mining...", payTxn.hash);
+
+        toast.info("Initialize Payment...", {
+          position: "top-left",
+          autoClose: 18050,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        await payTxn.wait();
+
+        console.log("Mined -- ", payTxn.hash);
+
+        count = await payPortalContract.getTotalPay();
+
+        console.log("Retrieved total payments count...", count.toNumber());
+
+        setMessage("");
+        setName("");
+
+        toast.success("Payment Effected!", {
+          position: "top-left",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      toast.error(`${error.message}`, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  };
+
+  /*
+   * Create a method that gets all payments from your contract
+   */
+  const getAllPay = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const payPortalContract = new ethers.Contract(
+          contractAddress,
+          contractABI,
+          signer
+        );
+
+        /*
+         * Call the getAllPay method from your Smart Contract
+         */
+        const pays = await payPortalContract.getAllPay();
+
+        /*
+         * We only need address, timestamp, title, and description in our UI so let's
+         * pick those out
+         */
+        const payCleaned = pays.map((pay) => {
+          return {
+            address: pay.giver,
+            timestamp: new Date(pay.timestamp * 1000),
+            description: pay.message,
+            title: pay.name,
+          };
+        });
+
+        /*
+         * Store our data in React State
+         */
+        setAllPay(payCleaned);
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  /*
+   * This runs our function when the page loads.
+   */
+  useEffect(() => {
+    let payPortalContract;
+    getAllPay();
+    checkIfWalletIsConnected();
+
+    const onNewPay = (from, timestamp, description, title) => {
+      console.log("NewPay", from, timestamp, description, title);
+      setAllPay((prevState) => [
+        ...prevState,
+        {
+          address: from,
+          timestamp: new Date(timestamp * 1000),
+          description: description,
+          title: title,
+        },
+      ]);
+    };
+
+    if (window.ethereum) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+
+      payPortalContract = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer
+      );
+      payPortalContract.on("NewPay", onNewPay);
+    }
+
+    return () => {
+      if (payPortalContract) {
+        payPortalContract.off("NewPay", onNewPay);
+      }
+    };
+  }, []);
+
+  const handleOnMessageChange = (event) => {
+    const { value } = event.target;
+    setMessage(value);
+  };
+  const handleOnNameChange = (event) => {
+    const { value } = event.target;
+    setName(value);
+  };
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center py-2">
+    <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <Head>
-        <title>Create Next App</title>
+        <title>Make Payment</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex w-full flex-1 flex-col items-center justify-center px-20 text-center">
-        <h1 className="text-6xl font-bold">
-          Welcome to{' '}
-          <a className="text-blue-600" href="https://nextjs.org">
-            Next.js!
-          </a>
+      <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
+        <h1 className="text-6xl font-bold text-blue-600 mb-6">
+          Make Payment
         </h1>
+        {/*
+         * If there is currentAccount render this form, else render a button to connect wallet
+         */}
 
-        <p className="mt-3 text-2xl">
-          Get started by editing{' '}
-          <code className="rounded-md bg-gray-100 p-3 font-mono text-lg">
-            pages/index.tsx
-          </code>
-        </p>
+        {currentAccount ? (
+          <div className="w-full max-w-xs sticky top-3 z-50 ">
+            <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+              <div className="mb-4">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="name"
+                >
+                  Title
+                </label>
+                <input
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="name"
+                  type="text"
+                  placeholder="Title"
+                  onChange={handleOnNameChange}
+                  required
+                />
+              </div>
 
-        <div className="mt-6 flex max-w-4xl flex-wrap items-center justify-around sm:w-full">
-          <a
-            href="https://nextjs.org/docs"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
+              <div className="mb-4">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="message"
+                >
+                  Will send a Description
+                </label>
+
+                <textarea
+                  className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  rows="3"
+                  placeholder="Description"
+                  id="message"
+                  onChange={handleOnMessageChange}
+                  required
+                ></textarea>
+              </div>
+
+              <div className="flex items-left justify-between">
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-center text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  type="button"
+                  onClick={buyItem}
+                >
+                  Make Payment
+                </button>
+              </div>
+            </form>
+          </div>
+        ) : (
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-full mt-3"
+            onClick={connectWallet}
           >
-            <h3 className="text-2xl font-bold">Documentation &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Find in-depth information about Next.js features and its API.
-            </p>
-          </a>
+            Connect Your Wallet
+          </button>
+        )}
 
-          <a
-            href="https://nextjs.org/learn"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Learn &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Learn about Next.js in an interactive course with quizzes!
-            </p>
-          </a>
+        {allPay.map((pay, index) => {
+          return (
+            <div className="border-l-2 mt-10" key={index}>
+              <div className="transform transition cursor-pointer hover:-translate-y-2 ml-10 relative flex items-center px-6 py-4 bg-blue-800 text-white rounded mb-10 flex-col md:flex-row space-y-4 md:space-y-0">
+                {/* <!-- Dot Following the Left Vertical Line --> */}
+                <div className="w-5 h-5 bg-blue-600 absolute -left-10 transform -translate-x-2/4 rounded-full z-10 mt-2 md:mt-0"></div>
 
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Examples &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Discover and deploy boilerplate example Next.js projects.
-            </p>
-          </a>
+                {/* <!-- Line that connecting the box with the vertical line --> */}
+                <div className="w-10 h-1 bg-green-300 absolute -left-10 z-0"></div>
 
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Deploy &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
+                {/* <!-- Content that showing in the box --> */}
+                <div className="flex-auto">
+                  <h1 className="text-md">Item: {pay.title}</h1>
+                  <h1 className="text-md">Description: {pay.description}</h1>
+                  <h3>Address: {pay.address}</h3>
+                  <h1 className="text-md font-bold">
+                    TimeStamp: {pay.timestamp.toString()}
+                  </h1>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </main>
-
-      <footer className="flex h-24 w-full items-center justify-center border-t">
-        <a
-          className="flex items-center justify-center gap-2"
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-        </a>
-      </footer>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
-  )
+  );
 }
-
-export default Home
