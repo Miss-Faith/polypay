@@ -5,12 +5,14 @@ import "react-toastify/dist/ReactToastify.css";
 
 import Head from "next/head";
 
+// Import abi
+import abi from "../utils/PayPortal.json";
 
 export default function Home() {
   /**
    * Create a variable here that holds the contract address after you deploy!
    */
-  const contractAddress = "";
+  const contractAddress = "0xe225eA6791127477Fd79fC7A9CEE474575D9b4cb";
 
   /**
    * Create a variable here that references the abi content!
@@ -22,9 +24,9 @@ export default function Home() {
    */
   const [currentAccount, setCurrentAccount] = useState("");
 
-  const [description, setMessage] = useState("");
+  const [message, setMessage] = useState("");
 
-  const [title, setName] = useState("");
+  const [name, setName] = useState("");
 
   /*
    * All state property to store all payments
@@ -64,7 +66,7 @@ export default function Home() {
         });
       }
     } catch (error) {
-      toast.error(`${error.message}`, {
+      toast.error("Make sure you have MetaMask Connected", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -105,7 +107,7 @@ export default function Home() {
     }
   };
 
-  const buyItem = async () => {
+  const buyPay = async () => {
     try {
       const { ethereum } = window;
 
@@ -119,22 +121,22 @@ export default function Home() {
         );
 
         let count = await payPortalContract.getTotalPay();
-        console.log("Retrieved total payments count...", count.toNumber());
+        console.log("Retrieved total payment count...", count.toNumber());
 
         /*
          * Execute the actual payment from your smart contract
          */
         const payTxn = await payPortalContract.buyPay(
-          description ? description : "Lovely Item",
-          title ? title : "Cup",
-          ethers.utils.parseEther("0.000001"),
+          message ? message : "Payment for Item 1",
+          name ? name : "Item 1",
+          ethers.utils.parseEther("0.001"),
           {
             gasLimit: 300000,
           }
         );
         console.log("Mining...", payTxn.hash);
 
-        toast.info("Initialize Payment...", {
+        toast.info("Sending payment...", {
           position: "top-left",
           autoClose: 18050,
           hideProgressBar: false,
@@ -149,12 +151,12 @@ export default function Home() {
 
         count = await payPortalContract.getTotalPay();
 
-        console.log("Retrieved total payments count...", count.toNumber());
+        console.log("Retrieved total payment count...", count.toNumber());
 
         setMessage("");
         setName("");
 
-        toast.success("Payment Effected!", {
+        toast.success("Success Payment Done!", {
           position: "top-left",
           autoClose: 5000,
           hideProgressBar: false,
@@ -200,15 +202,15 @@ export default function Home() {
         const pays = await payPortalContract.getAllPay();
 
         /*
-         * We only need address, timestamp, title, and description in our UI so let's
+         * We only need address, timestamp, name, and message in our UI so let's
          * pick those out
          */
         const payCleaned = pays.map((pay) => {
           return {
             address: pay.giver,
             timestamp: new Date(pay.timestamp * 1000),
-            description: pay.message,
-            title: pay.name,
+            message: pay.message,
+            name: pay.name,
           };
         });
 
@@ -232,15 +234,15 @@ export default function Home() {
     getAllPay();
     checkIfWalletIsConnected();
 
-    const onNewPay = (from, timestamp, description, title) => {
-      console.log("NewPay", from, timestamp, description, title);
+    const onNewPay = (from, timestamp, message, name) => {
+      console.log("NewPay", from, timestamp, message, name);
       setAllPay((prevState) => [
         ...prevState,
         {
           address: from,
           timestamp: new Date(timestamp * 1000),
-          description: description,
-          title: title,
+          message: message,
+          name: name,
         },
       ]);
     };
@@ -313,7 +315,7 @@ export default function Home() {
                   className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="message"
                 >
-                  Will send a Description
+                  Item Description
                 </label>
 
                 <textarea
@@ -330,9 +332,9 @@ export default function Home() {
                 <button
                   className="bg-blue-500 hover:bg-blue-700 text-center text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                   type="button"
-                  onClick={buyItem}
+                  onClick={buyPay}
                 >
-                  Make Payment
+                  Support $5
                 </button>
               </div>
             </form>
@@ -358,8 +360,8 @@ export default function Home() {
 
                 {/* <!-- Content that showing in the box --> */}
                 <div className="flex-auto">
-                  <h1 className="text-md">Item: {pay.title}</h1>
-                  <h1 className="text-md">Description: {pay.description}</h1>
+                  <h1 className="text-md">Supporter: {pay.name}</h1>
+                  <h1 className="text-md">Message: {pay.message}</h1>
                   <h3>Address: {pay.address}</h3>
                   <h1 className="text-md font-bold">
                     TimeStamp: {pay.timestamp.toString()}
