@@ -1,23 +1,57 @@
 const main = async () => {
+  const payContractFactory = await hre.ethers.getContractFactory(
+    "PayPortal"
+  );
+  const payContract = await payContractFactory.deploy({
+    value: hre.ethers.utils.parseEther("0.1"),
+  });
+  await payContract.deployed();
+  console.log("Pay Contract deployed to:", payContract.address);
 
-  // This will actually compile our contract and generate the necessary files we need to work with our contract under the artifacts directory.
-    const payContractFactory = await hre.ethers.getContractFactory('PayPortal');
-    const payContract = await payContractFactory.deploy();
-  
-    await payContract.deployed(); // We'll wait until our contract is officially deployed to our local blockchain! Our constructor runs when we actually deploy.
-  
-   console.log("Pay Contract deployed to:", payContract.address);
-  };
-  
-  const runMain = async () => {
-    try {
-      await main();
-      process.exit(0);
-    } catch (error) {
-      console.log(error);
-      process.exit(1);
-    }
-  };
-  
-  runMain();
-  
+  /*
+   * Get Contract balance
+   */
+  let contractBalance = await hre.ethers.provider.getBalance(
+    payContract.address
+  );
+  console.log(
+    "Contract balance:",
+    hre.ethers.utils.formatEther(contractBalance)
+  );
+
+  /*
+   * Let's try to buy an Item
+   */
+  const payTxn = await payContract.buyItem(
+    "This is item #1",
+    "idris",
+    ethers.utils.parseEther("0.001")
+  );
+  await payTxn.wait();
+
+  /*
+   * Get Contract balance to see what happened!
+   */
+  contractBalance = await hre.ethers.provider.getBalance(
+    payContract.address
+  );
+  console.log(
+    "Contract balance:",
+    hre.ethers.utils.formatEther(contractBalance)
+  );
+
+  let allPay = await payContract.getAllPay();
+  console.log(allPay);
+};
+
+const runMain = async () => {
+  try {
+    await main();
+    process.exit(0);
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+};
+
+runMain();
