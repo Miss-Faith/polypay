@@ -3,7 +3,7 @@ const main = async () => {
     "PayPortal"
   );
   const payContract = await payContractFactory.deploy({
-    value: hre.ethers.utils.parseEther("0.0001"),
+    value: hre.ethers.utils.parseEther("0.1"),
   });
   await payContract.deployed();
   console.log("Pay Contract deployed to:", payContract.address);
@@ -20,12 +20,12 @@ const main = async () => {
   );
 
   /*
-   * Let's try to buy an Item
+   * Let's try to buy an item
    */
-  const payTxn = await payContract.buyItem(
-    "This is item #1",
+  const payTxn = await payContract.buyPay(
+    "This is payment #1",
     "idris",
-    ethers.utils.parseEther("0.000001")
+    ethers.utils.parseEther("0.001")
   );
   await payTxn.wait();
 

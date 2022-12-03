@@ -9,15 +9,18 @@ contract PayPortal {
 
     address payable public owner; 
 
+    /*
+     * A little magic, Google what events are in Solidity!
+     */
     event NewPay(
         address indexed from,
         uint256 timestamp,
-        string description,
-        string title
+        string message,
+        string name
     );
 
     constructor() payable {
-        console.log("Smart Pay Contract");
+        console.log("Yo! Smart Contract");
 
         // user who is calling this function address
         owner = payable(msg.sender);
@@ -28,52 +31,58 @@ contract PayPortal {
      * A struct is basically a custom datatype where we can customize what we want to hold inside it.
      */
     struct Pay {
-        address giver; // The address of the user who pays.
-        string description; // The description of the item bought.
-        string title; // The title of the item bought.
-        uint256 timestamp; // The timestamp when the user buys an item.
+        address giver; // The address of the user who buys an item.
+        string message; // The description of the item bought.
+        string name; // The title of the item bought.
+        uint256 timestamp; // The timestamp when the item is bought.
     }
 
     /*
      * I declare variable pay that lets me store an array of structs.
-     * This is what lets me hold all the payments ever received from the store!
+     * This is what lets me hold all the payments anyone ever sends to me!
      */
     Pay[] pay;
 
     /*
      * I added a function getAllPay which will return the struct array, pay, to us.
-     * This will make it easy to retrieve the payments from our website!
+     * This will make it easy to retrieve the pay from our website!
      */
     function getAllPay() public view returns (Pay[] memory) {
         return pay;
     }
 
-    // Get All pay bought
+    // Get All payments
     function getTotalPay() public view returns (uint256) {
-        console.log("We have %d total payments recieved ", totalPay);
+        // Optional: Add this line if you want to see the contract print the value!
+        // We'll also print it over in run.js as well.
+        console.log("We have %d total pay recieved ", totalPay);
         return totalPay;
     }
 
-
-    function buyItem(
-        string memory _description,
-        string memory _title,
+    /*
+     * You'll notice I changed the buyPay function a little here as well and
+     * now it requires a string called _message. This is the message our user
+     * sends us from the front end!
+     */
+    function buyPay(
+        string memory _message,
+        string memory _name,
         uint256 _payAmount
     ) public payable {
         uint256 cost = 0.001 ether;
         require(_payAmount <= cost, "Insufficient Ether provided");
 
         totalPay += 1;
-        console.log("%s has just sent payment!", msg.sender);
+        console.log("%s has just sent a payment!", msg.sender);
 
         /*
-         * This is where I actually store the payments data in the array.
+         * This is where I actually store the payment data in the array.
          */
-        pay.push(Pay(msg.sender, _description, _title, block.timestamp));
+        pay.push(Pay(msg.sender, _message, _name, block.timestamp));
 
         (bool success, ) = owner.call{value: _payAmount}("");
         require(success, "Failed to send money");
 
-        emit NewPay(msg.sender, block.timestamp, _description, _title);
+        emit NewPay(msg.sender, block.timestamp, _message, _name);
     }
 }

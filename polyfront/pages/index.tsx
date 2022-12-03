@@ -3,12 +3,20 @@ import { ToastContainer, toast } from "react-toastify";
 import { ethers } from "ethers";
 import "react-toastify/dist/ReactToastify.css";
 
+import ReactDOM from 'react-dom';
+import axios from 'axios';
+import swal from 'sweetalert';
+import { useHistory } from 'react-router-dom';
+
 import Head from "next/head";
 
 // Import abi
 import abi from "../utils/PayPortal.json";
 
+
+
 export default function Home() {
+
   /**
    * Create a variable here that holds the contract address after you deploy!
    */
@@ -129,7 +137,7 @@ export default function Home() {
         const payTxn = await payPortalContract.buyPay(
           message ? message : "Payment for Item 1",
           name ? name : "Item 1",
-          ethers.utils.parseEther("0.001"),
+          ethers.utils.parseEther("0.0001"),
           {
             gasLimit: 300000,
           }
@@ -276,6 +284,12 @@ export default function Home() {
   };
 
   return (
+
+    
+
+
+
+
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <Head>
         <title>Make Payment</title>
@@ -334,7 +348,7 @@ export default function Home() {
                   type="button"
                   onClick={buyPay}
                 >
-                  Support $5
+                  Make Payment
                 </button>
               </div>
             </form>

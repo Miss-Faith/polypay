@@ -7,7 +7,7 @@ const main = async () => {
 
   const Token = await hre.ethers.getContractFactory("PayPortal");
   const portal = await Token.deploy({
-    value: hre.ethers.utils.parseEther("0.0001"),
+    value: hre.ethers.utils.parseEther("0.1"),
   });
   await portal.deployed();
 
