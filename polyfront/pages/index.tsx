@@ -13,8 +13,6 @@ import Head from "next/head";
 // Import abi
 import abi from "../utils/PayPortal.json";
 
-
-
 export default function Home() {
 
   /**
@@ -35,6 +33,8 @@ export default function Home() {
   const [message, setMessage] = useState("");
 
   const [name, setName] = useState("");
+
+  const[amount, setAmount] = useState()
 
   /*
    * All state property to store all payments
@@ -135,9 +135,9 @@ export default function Home() {
          * Execute the actual payment from your smart contract
          */
         const payTxn = await payPortalContract.buyPay(
-          message ? message : "Payment for Item 1",
-          name ? name : "Item 1",
-          ethers.utils.parseEther("0.0001"),
+          message ? message : handleOnMessageChange,
+          name ? name : handleOnMessageChange,
+          amount ? amount : ethers.utils.parseEther(handleOnAmountChange),
           {
             gasLimit: 300000,
           }
@@ -282,17 +282,15 @@ export default function Home() {
     const { value } = event.target;
     setName(value);
   };
-
+  const handleOnAmountChange = (event) => {
+    const { value } = event.target.value.replace(/\+|-/ig, '');
+    setAmount(value);
+  };
   return (
-
-    
-
-
-
 
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <Head>
-        <title>Make Payment</title>
+        <title>Poly Payments</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -329,7 +327,7 @@ export default function Home() {
                   className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="message"
                 >
-                  Item Description
+                  Description
                 </label>
 
                 <textarea
@@ -340,6 +338,25 @@ export default function Home() {
                   onChange={handleOnMessageChange}
                   required
                 ></textarea>
+              </div>
+
+              <div className="mb-4">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="amount"
+                >
+                  Amount
+                </label>
+
+                <input
+                  className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  rows="3"
+                  placeholder="Amount"
+                  id="amount"
+                  type="number"
+                  onChange={handleOnAmountChange}
+                  required
+                ></input>
               </div>
 
               <div className="flex items-left justify-between">
@@ -374,8 +391,9 @@ export default function Home() {
 
                 {/* <!-- Content that showing in the box --> */}
                 <div className="flex-auto">
-                  <h1 className="text-md">Supporter: {pay.name}</h1>
-                  <h1 className="text-md">Message: {pay.message}</h1>
+                  <h1 className="text-md">Title/Name: {pay.name}</h1>
+                  <h1 className="text-md">Description: {pay.message}</h1>
+                  <h1 className="text-md">Amount: {pay.amount}</h1>
                   <h3>Address: {pay.address}</h3>
                   <h1 className="text-md font-bold">
                     TimeStamp: {pay.timestamp.toString()}
