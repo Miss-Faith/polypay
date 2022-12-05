@@ -5,7 +5,7 @@ A web3 application that allows for Matic payments. Intergrate to your online sto
 
 
 ## Site
-[Black Pearl]() - Pending deployment
+[PolyPay]() - Pending deployment
 ### Setup Requirements
 
 
