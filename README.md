@@ -1,4 +1,4 @@
-# [Black Pearl](https://github.com/Miss-Faith/polypay)
+# [PolyPay](https://github.com/Miss-Faith/polypay)
 #### By [Faith Mwangi](https://github.com/miss-faith)
 ### Description
 A web3 application that allows for Matic payments. Intergrate to your online stores or cash collection platforms to allow clients to intergrate with their wallets and send matic payments
