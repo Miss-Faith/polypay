@@ -1,33 +1,27 @@
-// SPDX-License-Identifier: UNLICENSED
-
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.7;
 
 import "hardhat/console.sol";
 
 contract PayPortal {
     uint256 totalPay;
-
     address payable public owner; 
 
-    /*
-     * A little magic, Google what events are in Solidity!
-     */
-    event NewPay(
-        address indexed from,
-        uint256 timestamp,
-        string message,
-        string name
-    );
-
-    constructor() payable {
-        console.log("Yo! Smart Contract");
-
+    constructor() {
         // user who is calling this function address
         owner = payable(msg.sender);
     }
 
+    event NewPay(
+        address indexed from,
+        uint256 timestamp,
+        string message,
+        string name,
+        uint256 _payAmount
+    );
+
     /*
-     * I created a struct here named Pay.
+     * I created a struct named Pay.
      * A struct is basically a custom datatype where we can customize what we want to hold inside it.
      */
     struct Pay {
@@ -35,6 +29,7 @@ contract PayPortal {
         string message; // The description of the item bought.
         string name; // The title of the item bought.
         uint256 timestamp; // The timestamp when the item is bought.
+        uint256 _payAmount; // The amount of funds
     }
 
     /*
@@ -53,18 +48,14 @@ contract PayPortal {
 
     // Get All payments
     function getTotalPay() public view returns (uint256) {
-        // Optional: Add this line if you want to see the contract print the value!
-        // We'll also print it over in run.js as well.
         console.log("We have %d total pay recieved ", totalPay);
         return totalPay;
     }
 
     /*
-     * You'll notice I changed the buyPay function a little here as well and
-     * now it requires a string called _message. This is the message our user
-     * sends us from the front end!
+     * Execute Initialize payment
      */
-    function buyPay(
+    function makePayment(
         string memory _message,
         string memory _name,
         uint256 _payAmount
@@ -78,11 +69,11 @@ contract PayPortal {
         /*
          * This is where I actually store the payment data in the array.
          */
-        pay.push(Pay(msg.sender, _message, _name, block.timestamp));
+        pay.push(Pay(msg.sender, _message, _name, block.timestamp, _payAmount));
 
         (bool success, ) = owner.call{value: _payAmount}("");
         require(success, "Failed to send money");
 
-        emit NewPay(msg.sender, block.timestamp, _message, _name);
+        emit NewPay(msg.sender, block.timestamp, _message, _name, _payAmount);
     }
 }

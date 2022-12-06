@@ -115,7 +115,7 @@ export default function Home() {
     }
   };
 
-  const buyPay = async () => {
+  const makePayment = async () => {
     try {
       const { ethereum } = window;
 
@@ -134,10 +134,10 @@ export default function Home() {
         /*
          * Execute the actual payment from your smart contract
          */
-        const payTxn = await payPortalContract.buyPay(
+        const payTxn = await payPortalContract.makePayment(
           message ? message : handleOnMessageChange,
           name ? name : handleOnMessageChange,
-          amount ? amount : ethers.utils.parseEther(handleOnAmountChange),
+          ethers.utils.parseEther("0.00001"),
           {
             gasLimit: 300000,
           }
@@ -363,7 +363,7 @@ export default function Home() {
                 <button
                   className="bg-blue-500 hover:bg-blue-700 text-center text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                   type="button"
-                  onClick={buyPay}
+                  onClick={makePayment}
                 >
                   Make Payment
                 </button>
