@@ -300,7 +300,7 @@ export default function Home() {
   };
   
   return (
-      <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-teal-800">
+      <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-violet-800">
         <Head>
           <title>PolyPay</title>
           <link rel="icon" href="/favicon.ico" />
@@ -308,7 +308,7 @@ export default function Home() {
 
         <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
           <br/>
-          <h6 className="text-5xl font-bold text-black-300 mb-6">
+          <h6 className="text-5xl font-bold text-black-500 mb-6">
             Pay With Matic
           </h6>
           {/*
@@ -317,16 +317,16 @@ export default function Home() {
 
           {currentAccount ? (
             <div className="w-full max-w-xs sticky top-3 z-50 ">
-              <form className="bg-teal-900 shadow-md rounded px-8 pt-6 pb-8 mb-4">
+              <form className="bg-violet-900 shadow-md rounded px-8 pt-6 pb-8 mb-4">
                 <div className="mb-4">
                   <label
-                    className="block text-black-700 text-sm font-bold mb-2"
+                    className="block text-black-900 text-sm font-bold mb-2"
                     htmlFor="name"
                   >
                     Title
                   </label>
                   <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-black-700 leading-tight focus:outline-none focus:shadow-outline"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-black-900 leading-tight focus:outline-none focus:shadow-outline"
                     id="name"
                     type="text"
                     placeholder="Title"
@@ -336,14 +336,14 @@ export default function Home() {
 
                 <div className="mb-4">
                   <label
-                    className="block text-black-700 text-sm font-bold mb-2"
+                    className="block text-black-900 text-sm font-bold mb-2"
                     htmlFor="message"
                   >
                     Description
                   </label>
 
                   <textarea
-                    className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-black-700 leading-tight focus:outline-none focus:shadow-outline"
+                    className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-black-900 leading-tight focus:outline-none focus:shadow-outline"
                     rows="3"
                     placeholder="Description"
                     id="message"
@@ -354,14 +354,14 @@ export default function Home() {
 
                 <div className="mb-4">
                   <label
-                    className="block text-black-700 text-sm font-bold mb-2"
+                    className="block text-black-900 text-sm font-bold mb-2"
                     htmlFor="amount"
                   >
                     Amount
                   </label>
 
                   <input
-                    className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-black-700 leading-tight focus:outline-none focus:shadow-outline"
+                    className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-black-900 leading-tight focus:outline-none focus:shadow-outline"
                     rows="3"
                     placeholder="Amount"
                     id="amount"
@@ -373,7 +373,7 @@ export default function Home() {
 
                 <div className="flex items-left justify-between">
                   <button
-                    className="mx-auto bg-teal-800 hover:bg-teal-900 text-center text-white font-bold py-2 px-3 rounded focus:outline-none focus:shadow-outline"
+                    className="mx-auto bg-violet-600 hover:bg-violet-800 text-center text-white font-bold py-2 px-3 rounded focus:outline-none focus:shadow-outline"
                     type="button"
                     onClick={buyPay}
                   >
@@ -384,7 +384,7 @@ export default function Home() {
             </div>
           ) : (
             <button
-              className="mx-auto bg-teal-800 hover:bg-teal-900 text-white font-bold py-2 px-3 rounded-full mt-3"
+              className="mx-auto bg-violet-600 hover:bg-violet-900 text-white font-bold py-2 px-3 rounded-full mt-3"
               onClick={connectWallet}
             >
               Connect Your Wallet
@@ -395,12 +395,12 @@ export default function Home() {
           {allPay.map((pay, index) => {
             return (
               <div className="border-l-2 mt-10" key={index}>
-                <div className="transform transition cursor-pointer hover:-translate-y-2 ml-10 relative flex items-center px-6 py-4 bg-teal-900 text-white rounded mb-10 flex-col md:flex-row space-y-4 md:space-y-0">
+                <div className="transform transition cursor-pointer hover:-translate-y-2 ml-10 relative flex items-center px-6 py-4 bg-violet-900 text-white rounded mb-10 flex-col md:flex-row space-y-4 md:space-y-0">
                   {/* <!-- Dot Following the Left Vertical Line --> */}
-                  <div className="w-5 h-5 bg-teal-900 absolute -left-10 transform -translate-x-2/4 rounded-full z-10 mt-2 md:mt-0"></div>
+                  <div className="w-5 h-5 bg-violet-900 absolute -left-10 transform -translate-x-2/4 rounded-full z-10 mt-2 md:mt-0"></div>
 
                   {/* <!-- Line that connecting the box with the vertical line --> */}
-                  <div className="w-10 h-1 bg-teal-500 absolute -left-10 z-0"></div>
+                  <div className="w-10 h-1 bg-violet-500 absolute -left-10 z-0"></div>
 
                   {/* <!-- Content that showing in the box --> */}
                   <div className="flex-auto">
