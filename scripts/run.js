@@ -22,7 +22,7 @@ const main = async () => {
   /*
    * Let's try to buy an item
    */
-  const payTxn = await payContract.makePayment(
+  const payTxn = await payContract.buyPay(
     "This is payment #1",
     "idris",
     ethers.utils.parseEther("0.001")

@@ -1,17 +1,25 @@
 {
   "name": "polypay",
   "version": "1.0.0",
-  "description": "",
+  "description": "A web3 application that allows for Matic payments. Intergrate to your online stores or cash collection platforms to allow clients to intergrate with their wallets and send matic payments",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Miss-Faith/polypay.git"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Miss-Faith/polypay/issues"
+  },
+  "homepage": "https://github.com/Miss-Faith/polypay#readme",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
     "dotenv": "^16.0.3",
-    "hardhat": "^2.12.2"
+    "hardhat": "^2.12.3"
   }
 }

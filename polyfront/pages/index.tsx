@@ -18,7 +18,7 @@ export default function Home() {
   /**
    * Create a variable here that holds the contract address after you deploy!
    */
-  const contractAddress = "0xe225eA6791127477Fd79fC7A9CEE474575D9b4cb";
+  const contractAddress = "0x3B2ac81EAeCFD4b5BC0a6c3b22013f58FF4d8936";
 
   /**
    * Create a variable here that references the abi content!
@@ -115,7 +115,7 @@ export default function Home() {
     }
   };
 
-  const makePayment = async () => {
+  const buyPay = async () => {
     try {
       const { ethereum } = window;
 
@@ -134,7 +134,7 @@ export default function Home() {
         /*
          * Execute the actual payment from your smart contract
          */
-        const payTxn = await payPortalContract.makePayment(
+        const payTxn = await payPortalContract.buyPay(
           message ? message : handleOnMessageChange,
           name ? name : handleOnMessageChange,
           ethers.utils.parseEther("0.00001"),
@@ -363,7 +363,7 @@ export default function Home() {
                 <button
                   className="bg-blue-500 hover:bg-blue-700 text-center text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                   type="button"
-                  onClick={makePayment}
+                  onClick={buyPay}
                 >
                   Make Payment
                 </button>

@@ -83,8 +83,6 @@ $npm run build
 $npm run start //runs build app in production mode
 ```
 
-update the index file.
-
 **Cloning**
 Fork the repository and Git clone to your local machine. Access the file and run the program on the code editor, ubuntu, mac or windows terminal.
 
