@@ -4,7 +4,6 @@ import { ToastContainer, toast } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
 
-
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import swal from 'sweetalert';
@@ -20,7 +19,7 @@ export default function Home() {
   /**
    * Create a variable here that holds the contract address after you deploy!
    */
-  const contractAddress = "0xAc909d3Ca76A9F3084936C1bf75b3A107aB47fcA";
+  const contractAddress = "0x66b650a380c282EC0243BC7B118c1D38C818F37F";
 
   /**
    * Create a variable here that references the abi content!
@@ -38,10 +37,10 @@ export default function Home() {
 
   const [name, setName] = useState("");
 
-  const [amount, setAmount] = useState("");
+  // const [amount, setAmount] = useState<number | undefined>(0.00001);
+  const [payamount, setAmount] = useState("");
+  const [price, setPrice] = useState<number | undefined>(1);
 
-
-  const [storedPrice, setStoredPrice] = useState<number | undefined>(1);
 
   /*
    * All state property to store all payments
@@ -135,28 +134,19 @@ export default function Home() {
           signer
         );
 
-        const getStoredPrice = async () => {
-          try {
-            const contractPrice = await payPortalContract.getLatestPrice();
-            setStoredPrice(parseInt(contractPrice));
-          } catch (error) {
-            console.log("getStoredPrice Error: ", error);
-          }
-        }
-      
-        getStoredPrice().catch(console.error)
-        console.log(storedPrice)
-
         /*
          * Execute the actual payment from your smart contract
          */
         const payTxn = await payPortalContract.buyPay(
           message ? message : handleOnMessageChange,
           name ? name : handleOnMessageChange,
-          ethers.utils.parseEther("0.00001"),
-          {
-            gasLimit: 300000,
-          }
+          payamount ? payamount: ethers.utils.parseEther("0.00001"),
+          
+          // {
+          //     gasLimit: 300000,
+          // },
+          price ? price :  "1",
+
         );
 
 
@@ -180,7 +170,7 @@ export default function Home() {
 
         setMessage("");
         setName("");
-        setAmount("");
+        setAmount("");        
 
         toast.success("Success Payment Done!", {
           position: "top-left",
@@ -237,6 +227,8 @@ export default function Home() {
             timestamp: new Date(pay.timestamp * 1000),
             message: pay.message,
             name: pay.name,
+            price: parseInt(pay.price),
+            payamount: parseInt(pay.payamount)
           };
         });
 
@@ -260,7 +252,7 @@ export default function Home() {
     getAllPay();
     checkIfWalletIsConnected();
 
-    const onNewPay = (from, timestamp, message, name) => {
+    const onNewPay = (from, timestamp, message, name, price, payamount) => {
       console.log("NewPay", from, timestamp, message, name);
       setAllPay((prevState) => [
         ...prevState,
@@ -269,6 +261,8 @@ export default function Home() {
           timestamp: new Date(timestamp * 1000),
           message: message,
           name: name,
+          price: parseInt(price),
+          payamount: parseInt(payamount),
         },
       ]);
     };
@@ -301,9 +295,10 @@ export default function Home() {
     setName(value);
   };
   const handleOnAmountChange = (event) => {
-    const { value } = event.target.value.replace(/\+|-/ig, '');
+    const { value } = event.target.value.replace(/\+|-/ig, '').replace("E", "");
     setAmount(value);
   };
+  
   return (
       <div className="flex flex-col items-center justify-center min-h-screen py-2">
         <Head>
@@ -395,6 +390,7 @@ export default function Home() {
             </button>
           )}
 
+          
           {allPay.map((pay, index) => {
             return (
               <div className="border-l-2 mt-10" key={index}>
@@ -409,7 +405,8 @@ export default function Home() {
                   <div className="flex-auto">
                     <h1 className="text-md">Name: {pay.name}</h1>
                     <h1 className="text-md">Description: {pay.message}</h1>
-                    <h1 className="text-md">LatestPrice: {storedPrice}</h1>
+                    <h1 className="text-md">Amount: {pay.payamount} Wei - Polygon Mumbai</h1>
+                    <h1 className="text-md">LatestPrice: {pay.price}</h1>
                     <h3>Address: {pay.address}</h3>
                     <h1 className="text-md font-bold">
                       TimeStamp: {pay.timestamp.toString()}

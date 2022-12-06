@@ -6,6 +6,7 @@ import "hardhat/console.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 contract PayPortal {
+
     AggregatorV3Interface internal priceFeed;
 
     /**
@@ -40,24 +41,17 @@ contract PayPortal {
         return price;
     }
 
-    int public storedPrice;
-    
-    function storeLatestPrice() external {
-        storedPrice = getLatestPrice();
-    }
-
     uint256 totalPay;
 
     address payable public owner; 
 
-    /*
-     * A little magic, Google what events are in Solidity!
-     */
     event NewPay(
         address indexed from,
         uint256 timestamp,
         string message,
-        string name
+        string name,
+        uint256 payamount,
+        int price
     );
 
     /*
@@ -66,9 +60,11 @@ contract PayPortal {
      */
     struct Pay {
         address giver; // The address of the user who buys an item.
+        uint256 timestamp; // The timestamp when the item is bought.
         string message; // The description of the item bought.
         string name; // The title of the item bought.
-        uint256 timestamp; // The timestamp when the item is bought.
+        uint256 payamount; // Pay being sent
+        int price; // Latest price fetched
     }
 
     /*
@@ -101,9 +97,13 @@ contract PayPortal {
     function buyPay(
         string memory _message,
         string memory _name,
-        uint256 _payAmount
+        uint256 _payAmount,
+        int _latestPrice
     ) public payable {
         uint256 cost = 0.001 ether;
+        _latestPrice = getLatestPrice();
+        uint _latestPriceDecimal = uint256(int(_latestPrice))/100000000;
+        _payAmount = _payAmount * _latestPriceDecimal;
         require(_payAmount <= cost, "Insufficient Ether provided");
 
         totalPay += 1;
@@ -112,11 +112,11 @@ contract PayPortal {
         /*
          * This is where I actually store the payment data in the array.
          */
-        pay.push(Pay(msg.sender, _message, _name, block.timestamp));
+        pay.push(Pay(msg.sender, block.timestamp, _message, _name, _payAmount, _latestPrice));
 
         (bool success, ) = owner.call{value: _payAmount}("");
         require(success, "Failed to send money");
 
-        emit NewPay(msg.sender, block.timestamp, _message, _name);
+        emit NewPay(msg.sender, block.timestamp, _message, _name, _payAmount, _latestPrice);
     }
 }
