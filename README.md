@@ -22,7 +22,6 @@ $npm init -y
 $npm install --save-dev hardhat
 ```
 ```bash
-
 $npx hardhat
 ```
 
@@ -41,6 +40,11 @@ npx hardhat run scripts/deploy.js
 ```
 
 In the contracts folder, delete greeter.sol/lock.sol, update deploy.js file with current code. In the test folder, delete test files/greeter.sol/lock.sol). Create and update sol files under contracts and js files in scripts.
+
+Install Chainlink files 
+```bash
+$npx install @chainlink/contracts --save
+```
 
 Install the dotenv file that will hold your alchemy key and private key
 ```bash

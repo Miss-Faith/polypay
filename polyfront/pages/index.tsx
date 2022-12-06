@@ -18,7 +18,7 @@ export default function Home() {
   /**
    * Create a variable here that holds the contract address after you deploy!
    */
-  const contractAddress = "0x3B2ac81EAeCFD4b5BC0a6c3b22013f58FF4d8936";
+  const contractAddress = "0xfA13a26678EE573587CB98B534A1623db4A3C5a5";
 
   /**
    * Create a variable here that references the abi content!
@@ -391,7 +391,7 @@ export default function Home() {
 
                 {/* <!-- Content that showing in the box --> */}
                 <div className="flex-auto">
-                  <h1 className="text-md">Title/Name: {pay.name}</h1>
+                  <h1 className="text-md">Name: {pay.name}</h1>
                   <h1 className="text-md">Description: {pay.message}</h1>
                   <h1 className="text-md">Amount: {pay.amount}</h1>
                   <h3>Address: {pay.address}</h3>

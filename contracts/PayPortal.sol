@@ -1,10 +1,45 @@
-// SPDX-License-Identifier: UNLICENSED
-
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+
 contract PayPortal {
+    AggregatorV3Interface internal priceFeed;
+
+    /**
+     * Network: Mumbai
+     * Aggregator: Matic/USD
+     * Address: 0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada
+     */
+
+    constructor() payable {
+        priceFeed = AggregatorV3Interface(
+            0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada
+        );
+
+        console.log("Yo! Smart Contract");
+
+        // user who is calling this function address
+        owner = payable(msg.sender);
+    
+    }
+
+    /**
+     * Returns the latest price
+     */
+    function getLatestPrice() public view returns (int) {
+        (
+            ,
+            /*uint80 roundID*/ int price /*uint startedAt*/ /*uint timeStamp*/ /*uint80 answeredInRound*/,
+            ,
+            ,
+
+        ) = priceFeed.latestRoundData();
+        return price;
+    }
+
     uint256 totalPay;
 
     address payable public owner; 
@@ -18,13 +53,6 @@ contract PayPortal {
         string message,
         string name
     );
-
-    constructor() payable {
-        console.log("Yo! Smart Contract");
-
-        // user who is calling this function address
-        owner = payable(msg.sender);
-    }
 
     /*
      * I created a struct here named Pay.
