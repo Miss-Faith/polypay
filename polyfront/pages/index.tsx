@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { ethers } from "ethers";
 import "react-toastify/dist/ReactToastify.css";
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+
 
 import ReactDOM from 'react-dom';
 import axios from 'axios';
@@ -15,10 +17,14 @@ import abi from "../utils/PayPortal.json";
 
 export default function Home() {
 
+  const priceFeed = AggregatorV3Interface(
+    0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada
+  );
+
   /**
    * Create a variable here that holds the contract address after you deploy!
    */
-  const contractAddress = "0xfA13a26678EE573587CB98B534A1623db4A3C5a5";
+  const contractAddress = "0xAc909d3Ca76A9F3084936C1bf75b3A107aB47fcA";
 
   /**
    * Create a variable here that references the abi content!
@@ -28,13 +34,17 @@ export default function Home() {
   /*
    * Just a state variable we use to store our user's public wallet.
    */
+
+
   const [currentAccount, setCurrentAccount] = useState("");
 
   const [message, setMessage] = useState("");
 
   const [name, setName] = useState("");
 
-  const[amount, setAmount] = useState()
+  const [amount, setAmount] = useState("");
+
+  const[price, setPrice] =useState("")
 
   /*
    * All state property to store all payments
@@ -142,6 +152,14 @@ export default function Home() {
             gasLimit: 300000,
           }
         );
+
+        async function getETHPrice() {
+          let [ethPrice, decimals] = await payPortalContract.getLatestPrice();
+          ethPrice = Number(ethPrice / Math.pow(10, decimals)).toFixed(2);
+          return ethPrice;
+        }
+
+
         console.log("Mining...", payTxn.hash);
 
         toast.info("Sending payment...", {
@@ -163,6 +181,7 @@ export default function Home() {
 
         setMessage("");
         setName("");
+        setAmount("");
 
         toast.success("Success Payment Done!", {
           position: "top-left",
@@ -393,7 +412,7 @@ export default function Home() {
                 <div className="flex-auto">
                   <h1 className="text-md">Name: {pay.name}</h1>
                   <h1 className="text-md">Description: {pay.message}</h1>
-                  <h1 className="text-md">Amount: {pay.amount}</h1>
+                  <h1 className="text-md">Amount: handleOnAmountChange</h1>
                   <h3>Address: {pay.address}</h3>
                   <h1 className="text-md font-bold">
                     TimeStamp: {pay.timestamp.toString()}

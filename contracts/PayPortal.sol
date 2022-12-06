@@ -40,6 +40,12 @@ contract PayPortal {
         return price;
     }
 
+    int public storedPrice;
+    
+    function storeLatestPrice() external {
+        storedPrice = getLatestPrice();
+    }
+
     uint256 totalPay;
 
     address payable public owner; 
