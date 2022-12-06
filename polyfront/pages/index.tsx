@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
 import { ethers } from "ethers";
+import { ToastContainer, toast } from "react-toastify";
+
 import "react-toastify/dist/ReactToastify.css";
-import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 
 import ReactDOM from 'react-dom';
@@ -16,10 +16,6 @@ import Head from "next/head";
 import abi from "../utils/PayPortal.json";
 
 export default function Home() {
-
-  const priceFeed = AggregatorV3Interface(
-    0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada
-  );
 
   /**
    * Create a variable here that holds the contract address after you deploy!
@@ -44,7 +40,8 @@ export default function Home() {
 
   const [amount, setAmount] = useState("");
 
-  const[price, setPrice] =useState("")
+
+  const [storedPrice, setStoredPrice] = useState<number | undefined>(1);
 
   /*
    * All state property to store all payments
@@ -138,8 +135,17 @@ export default function Home() {
           signer
         );
 
-        let count = await payPortalContract.getTotalPay();
-        console.log("Retrieved total payment count...", count.toNumber());
+        const getStoredPrice = async () => {
+          try {
+            const contractPrice = await payPortalContract.getLatestPrice();
+            setStoredPrice(parseInt(contractPrice));
+          } catch (error) {
+            console.log("getStoredPrice Error: ", error);
+          }
+        }
+      
+        getStoredPrice().catch(console.error)
+        console.log(storedPrice)
 
         /*
          * Execute the actual payment from your smart contract
@@ -152,12 +158,6 @@ export default function Home() {
             gasLimit: 300000,
           }
         );
-
-        async function getETHPrice() {
-          let [ethPrice, decimals] = await payPortalContract.getLatestPrice();
-          ethPrice = Number(ethPrice / Math.pow(10, decimals)).toFixed(2);
-          return ethPrice;
-        }
 
 
         console.log("Mining...", payTxn.hash);
@@ -175,8 +175,7 @@ export default function Home() {
 
         console.log("Mined -- ", payTxn.hash);
 
-        count = await payPortalContract.getTotalPay();
-
+        let count = await payPortalContract.getTotalPay();
         console.log("Retrieved total payment count...", count.toNumber());
 
         setMessage("");
@@ -306,134 +305,131 @@ export default function Home() {
     setAmount(value);
   };
   return (
+      <div className="flex flex-col items-center justify-center min-h-screen py-2">
+        <Head>
+          <title>PolyPay</title>
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
 
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <Head>
-        <title>Poly Payments</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+        <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
+          <h1 className="text-6xl font-bold text-blue-600 mb-6">
+            Make Payment
+          </h1>
+          {/*
+     * If there is currentAccount render this form, else render a button to connect wallet
+     */}
 
-      <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
-        <h1 className="text-6xl font-bold text-blue-600 mb-6">
-          Make Payment
-        </h1>
-        {/*
-         * If there is currentAccount render this form, else render a button to connect wallet
-         */}
+          {currentAccount ? (
+            <div className="w-full max-w-xs sticky top-3 z-50 ">
+              <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+                <div className="mb-4">
+                  <label
+                    className="block text-gray-700 text-sm font-bold mb-2"
+                    htmlFor="name"
+                  >
+                    Title
+                  </label>
+                  <input
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    id="name"
+                    type="text"
+                    placeholder="Title"
+                    onChange={handleOnNameChange}
+                    required />
+                </div>
 
-        {currentAccount ? (
-          <div className="w-full max-w-xs sticky top-3 z-50 ">
-            <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="name"
-                >
-                  Title
-                </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="name"
-                  type="text"
-                  placeholder="Title"
-                  onChange={handleOnNameChange}
-                  required
-                />
-              </div>
+                <div className="mb-4">
+                  <label
+                    className="block text-gray-700 text-sm font-bold mb-2"
+                    htmlFor="message"
+                  >
+                    Description
+                  </label>
 
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="message"
-                >
-                  Description
-                </label>
+                  <textarea
+                    className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    rows="3"
+                    placeholder="Description"
+                    id="message"
+                    onChange={handleOnMessageChange}
+                    required
+                  ></textarea>
+                </div>
 
-                <textarea
-                  className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  rows="3"
-                  placeholder="Description"
-                  id="message"
-                  onChange={handleOnMessageChange}
-                  required
-                ></textarea>
-              </div>
+                <div className="mb-4">
+                  <label
+                    className="block text-gray-700 text-sm font-bold mb-2"
+                    htmlFor="amount"
+                  >
+                    Amount
+                  </label>
 
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="amount"
-                >
-                  Amount
-                </label>
+                  <input
+                    className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    rows="3"
+                    placeholder="Amount"
+                    id="amount"
+                    type="number"
+                    onChange={handleOnAmountChange}
+                    required
+                  ></input>
+                </div>
 
-                <input
-                  className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  rows="3"
-                  placeholder="Amount"
-                  id="amount"
-                  type="number"
-                  onChange={handleOnAmountChange}
-                  required
-                ></input>
-              </div>
+                <div className="flex items-left justify-between">
+                  <button
+                    className="bg-blue-500 hover:bg-blue-700 text-center text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    type="button"
+                    onClick={buyPay}
+                  >
+                    Make Payment
+                  </button>
+                </div>
+              </form>
+            </div>
+          ) : (
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-full mt-3"
+              onClick={connectWallet}
+            >
+              Connect Your Wallet
+            </button>
+          )}
 
-              <div className="flex items-left justify-between">
-                <button
-                  className="bg-blue-500 hover:bg-blue-700 text-center text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                  type="button"
-                  onClick={buyPay}
-                >
-                  Make Payment
-                </button>
-              </div>
-            </form>
-          </div>
-        ) : (
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-full mt-3"
-            onClick={connectWallet}
-          >
-            Connect Your Wallet
-          </button>
-        )}
+          {allPay.map((pay, index) => {
+            return (
+              <div className="border-l-2 mt-10" key={index}>
+                <div className="transform transition cursor-pointer hover:-translate-y-2 ml-10 relative flex items-center px-6 py-4 bg-blue-800 text-white rounded mb-10 flex-col md:flex-row space-y-4 md:space-y-0">
+                  {/* <!-- Dot Following the Left Vertical Line --> */}
+                  <div className="w-5 h-5 bg-blue-600 absolute -left-10 transform -translate-x-2/4 rounded-full z-10 mt-2 md:mt-0"></div>
 
-        {allPay.map((pay, index) => {
-          return (
-            <div className="border-l-2 mt-10" key={index}>
-              <div className="transform transition cursor-pointer hover:-translate-y-2 ml-10 relative flex items-center px-6 py-4 bg-blue-800 text-white rounded mb-10 flex-col md:flex-row space-y-4 md:space-y-0">
-                {/* <!-- Dot Following the Left Vertical Line --> */}
-                <div className="w-5 h-5 bg-blue-600 absolute -left-10 transform -translate-x-2/4 rounded-full z-10 mt-2 md:mt-0"></div>
+                  {/* <!-- Line that connecting the box with the vertical line --> */}
+                  <div className="w-10 h-1 bg-green-300 absolute -left-10 z-0"></div>
 
-                {/* <!-- Line that connecting the box with the vertical line --> */}
-                <div className="w-10 h-1 bg-green-300 absolute -left-10 z-0"></div>
-
-                {/* <!-- Content that showing in the box --> */}
-                <div className="flex-auto">
-                  <h1 className="text-md">Name: {pay.name}</h1>
-                  <h1 className="text-md">Description: {pay.message}</h1>
-                  <h1 className="text-md">Amount: handleOnAmountChange</h1>
-                  <h3>Address: {pay.address}</h3>
-                  <h1 className="text-md font-bold">
-                    TimeStamp: {pay.timestamp.toString()}
-                  </h1>
+                  {/* <!-- Content that showing in the box --> */}
+                  <div className="flex-auto">
+                    <h1 className="text-md">Name: {pay.name}</h1>
+                    <h1 className="text-md">Description: {pay.message}</h1>
+                    <h1 className="text-md">LatestPrice: {storedPrice}</h1>
+                    <h3>Address: {pay.address}</h3>
+                    <h1 className="text-md font-bold">
+                      TimeStamp: {pay.timestamp.toString()}
+                    </h1>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </main>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-    </div>
+            );
+          })}
+        </main>
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover />
+      </div>
   );
 }
