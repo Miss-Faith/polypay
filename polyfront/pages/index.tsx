@@ -45,13 +45,13 @@ export default function Home() {
   // const [amount, setAmount] = useState<number | undefined>(0.00001);
   const [payamount, setAmount] = useState("");
   const [price, setPrice] = useState<number | undefined>(1);
-  // const [arr, setArr] = useState<any[]>([])
+  // const [arr, setArr] = useState<any[]>([]);
 
 
   /*
    * All state property to store all payments
    */
-  const [allPay, setAllPay] = useState([]);
+  const [allPay, setAllPay] = useState<any[]>([]);
 
   const checkIfWalletIsConnected = async () => {
     try {
