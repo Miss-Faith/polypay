@@ -9,6 +9,7 @@ import ReactDOM from 'react-dom';
 // import swal from 'sweetalert';
 // import { useHistory } from 'react-router-dom';
 
+
 import Head from "next/head";
 
 // Import abi
@@ -32,9 +33,7 @@ export default function Home() {
 
 
   const [currentAccount, setCurrentAccount] = useState("");
-
   const [message, setMessage] = useState("");
-
   const [name, setName] = useState("");
 
   // const [amount, setAmount] = useState<number | undefined>(0.00001);
@@ -185,7 +184,7 @@ export default function Home() {
         console.log("Ethereum object doesn't exist!");
       }
     } catch (error) {
-      toast.error(`${error.message}`, {
+      toast.error(`${"Ethereum object doesn't exist!"}`, {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -221,7 +220,7 @@ export default function Home() {
          * We only need address, timestamp, name, and message in our UI so let's
          * pick those out
          */
-        const payCleaned = pays.map((pay) => {
+        const payCleaned = pays.map((pay: { giver: any; timestamp: number; message: any; name: any; price: string; payamount: string; }) => {
           return {
             address: pay.giver,
             timestamp: new Date(pay.timestamp * 1000),
@@ -248,11 +247,11 @@ export default function Home() {
    * This runs our function when the page loads.
    */
   useEffect(() => {
-    let payPortalContract;
+    let payPortalContract: ethers.Contract;
     getAllPay();
     checkIfWalletIsConnected();
 
-    const onNewPay = (from, timestamp, message, name, price, payamount) => {
+    const onNewPay = (from: any, timestamp: number, message: any, name: any, price: string, payamount: string) => {
       console.log("NewPay", from, timestamp, message, name);
       setAllPay((prevState) => [
         ...prevState,
@@ -286,15 +285,15 @@ export default function Home() {
     };
   }, []);
 
-  const handleOnMessageChange = (event) => {
+  const handleOnMessageChange = (event: { target: { value: any; }; }) => {
     const { value } = event.target;
     setMessage(value);
   };
-  const handleOnNameChange = (event) => {
+  const handleOnNameChange = (event: { target: { value: any; }; }) => {
     const { value } = event.target;
     setName(value);
   };
-  const handleOnAmountChange = (event) => {
+  const handleOnAmountChange = (event: { target: { value: any; }; }) => {
     const { value } = event.target.value.replace(/\+|-/ig, '').replace("E", "");
     setAmount(value);
   };
@@ -361,14 +360,12 @@ export default function Home() {
                   </label>
 
                   <input
-                    className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-black-900 leading-tight focus:outline-none focus:shadow-outline"
-                    rows="3"
-                    placeholder="Amount"
-                    id="amount"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-black-900 leading-tight focus:outline-none focus:shadow-outline"
+                    id="name"
                     type="number"
+                    placeholder="Amount"
                     onChange={handleOnAmountChange}
-                    required
-                  ></input>
+                    required />
                 </div>
 
                 <div className="flex items-left justify-between">
@@ -404,13 +401,13 @@ export default function Home() {
 
                   {/* <!-- Content that showing in the box --> */}
                   <div className="flex-auto">
-                    <h1 className="text-md">Name: {pay.name}</h1>
-                    <h1 className="text-md">Description: {pay.message}</h1>
-                    <h1 className="text-md">Amount: {pay.payamount} Wei - Polygon Mumbai</h1>
-                    <h1 className="text-md">LatestPrice: {pay.price}</h1>
-                    <h3>Address: {pay.address}</h3>
+                    <h1 className="text-md">Name: {pay['name']}</h1>
+                    <h1 className="text-md">Description: {pay['message']}</h1>
+                    <h1 className="text-md">Amount: {pay['payamount']} Wei - Polygon Mumbai</h1>
+                    <h1 className="text-md">LatestPrice: {pay['price']}</h1>
+                    <h3>Address: {pay['address']}</h3>
                     <h1 className="text-md font-bold">
-                      TimeStamp: {pay.timestamp.toString()}
+                      TimeStamp: {pay['timestamp'].toString()}
                     </h1>
                   </div>
                 </div>
