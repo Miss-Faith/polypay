@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { ToastContainer, toast } from "react-toastify";
-
+import { ExternalProvider } from "@ethersproject/providers";
 import "react-toastify/dist/ReactToastify.css";
 
 import ReactDOM from 'react-dom';
@@ -9,6 +9,11 @@ import ReactDOM from 'react-dom';
 // import swal from 'sweetalert';
 // import { useHistory } from 'react-router-dom';
 
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
 
 import Head from "next/head";
 
@@ -16,6 +21,7 @@ import Head from "next/head";
 import abi from "../utils/PayPortal.json";
 
 export default function Home() {
+  
 
   /**
    * Create a variable here that holds the contract address after you deploy!
@@ -39,6 +45,7 @@ export default function Home() {
   // const [amount, setAmount] = useState<number | undefined>(0.00001);
   const [payamount, setAmount] = useState("");
   const [price, setPrice] = useState<number | undefined>(1);
+  // const [arr, setArr] = useState<any[]>([])
 
 
   /*
@@ -343,7 +350,6 @@ export default function Home() {
 
                   <textarea
                     className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-black-900 leading-tight focus:outline-none focus:shadow-outline"
-                    rows="3"
                     placeholder="Description"
                     id="message"
                     onChange={handleOnMessageChange}
