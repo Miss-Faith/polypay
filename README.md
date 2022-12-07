@@ -1,11 +1,15 @@
 # [PolyPay](https://github.com/Miss-Faith/polypay)
 #### By [Faith Mwangi](https://github.com/miss-faith)
 ### Description
-A web3 application that allows for Matic payments. Intergrate to your online stores or cash collection platforms to allow clients to intergrate with their wallets and send matic payments
+A web3 application that allows for Matic payments. The site fetched the latest USD/Matic price so that payments are made with real-time rates. 
 
+#### Use Cases
+Intergrate to your online stores or cash collection platforms to allow clients or supporters to intergrate their wallets and send payments in Matic.
+
+Test the site Polygon Mumbai - 0 funds sent only das costs are incurred
 
 ## Site
-[PolyPay]() - Pending deployment
+[PolyPay](https://polypay-buuho8p40-miss-faith.vercel.app/) - Click to view live site
 ### Setup Requirements
 
 
@@ -65,7 +69,7 @@ To deploy on a test network, run:
 $npx hardhat run scripts/deploy.js --network mumbai
 ```
 
-To create your own react front-end with tailwind run the following code
+To create your own react front-end with tailwind; run the following code
 ```bash
 $npx create-next-app -e with-tailwindcss
 ```
@@ -104,9 +108,6 @@ Install npm dependencies and run app
 * Javascript
 * Chainlink
 * Alchemy
-
-## Future Developments
-Update chainlink to fetch usd/matic payments and make payments using the current rates.
 
 
 ## Development
