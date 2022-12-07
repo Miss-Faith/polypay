@@ -5,9 +5,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import ReactDOM from 'react-dom';
-import axios from 'axios';
-import swal from 'sweetalert';
-import { useHistory } from 'react-router-dom';
+// import axios from 'axios';
+// import swal from 'sweetalert';
+// import { useHistory } from 'react-router-dom';
 
 import Head from "next/head";
 
