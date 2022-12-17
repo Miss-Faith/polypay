@@ -146,7 +146,8 @@ export default function Home() {
         const payTxn = await payPortalContract.buyPay(
           message ? message : handleOnMessageChange,
           name ? name : handleOnMessageChange,
-          payamount ? payamount: ethers.utils.parseEther("0.00001"),
+          payamount ? payamount: handleOnAmountChange,
+          // payamount ? payamount: ethers.utils.parseEther("0.00001"),
           
           // {
           //     gasLimit: 300000,
@@ -188,10 +189,10 @@ export default function Home() {
           progress: undefined,
         });
       } else {
-        console.log("Ethereum object doesn't exist!");
+        console.log("Transaction Failed!");
       }
     } catch (error) {
-      toast.error(`${"Ethereum object doesn't exist!"}`, {
+      toast.error(`${"Transaction Failed!"}`, {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -301,7 +302,8 @@ export default function Home() {
     setName(value);
   };
   const handleOnAmountChange = (event: { target: { value: any; }; }) => {
-    const { value } = event.target.value.replace(/\+|-/ig, '').replace("E", "");
+    // const { value } = event.target.value.replace(/\+|-/ig, '').replace("E", "");
+    const { value } = event.target;
     setAmount(value);
   };
   
@@ -369,7 +371,7 @@ export default function Home() {
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-black-900 leading-tight focus:outline-none focus:shadow-outline"
                     id="name"
                     type="number"
-                    placeholder="Amount"
+                    placeholder="Amount in USD"
                     onChange={handleOnAmountChange}
                     required />
                 </div>
