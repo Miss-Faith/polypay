@@ -5,9 +5,6 @@ import { ExternalProvider } from "@ethersproject/providers";
 import "react-toastify/dist/ReactToastify.css";
 
 import ReactDOM from 'react-dom';
-// import axios from 'axios';
-// import swal from 'sweetalert';
-// import { useHistory } from 'react-router-dom';
 
 declare global {
   interface Window {
@@ -26,6 +23,7 @@ export default function Home() {
   /**
    * Create a variable here that holds the contract address after you deploy!
    */
+
   const contractAddress = "0x66b650a380c282EC0243BC7B118c1D38C818F37F";
 
   /**
